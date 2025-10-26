@@ -1,0 +1,20 @@
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: my-grpc-health-check
+  namespace: grpc-cookie
+spec:
+  targetRef:
+    group: ""
+    kind: Service 
+    name: whereami-grpc
+  default:
+    config:
+      type: GRPC # see here: https://cloud.google.com/load-balancing/docs/health-check-concepts#criteria-protocol-grpc - TLS support is in preview
+      grpcHealthCheck:
+        port: 9090 # The port your gRPC service is running on.
+        #grpcServiceName: "" # The name of the gRPC service to check. "" for the overall server.
+    timeoutSec: 10
+    checkIntervalSec: 15
+    healthyThreshold: 1
+    unhealthyThreshold: 3

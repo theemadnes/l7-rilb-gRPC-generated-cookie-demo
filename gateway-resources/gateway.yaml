@@ -1,0 +1,13 @@
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+   name: internal-http
+   namespace: grpc-cookie
+spec:
+  # Specify an existing GatewayClass.
+  gatewayClassName: gke-l7-rilb
+  listeners:
+  # Listen for HTTP traffic on port 80.
+  - name: http
+    protocol: HTTP
+    port: 80

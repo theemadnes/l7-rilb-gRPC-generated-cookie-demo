@@ -1,0 +1,24 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: whereami-grpc-route
+  namespace: grpc-cookie # replace with your values
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    #sectionName: https # replace with your values # not needed for this sample
+    name: internal-http # Name of your GKE Gateway
+    namespace: grpc-cookie # replace with your gateway's namespace
+    kind: Gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        #value: / # Matches all methods of whereami.Whereami
+        value: /whereami.Whereami    
+    backendRefs:
+    #- group: net.gke.io # for multi-cluster; not needed for single-cluster
+    - namespace: grpc-cookie # replace with your values
+      kind: Service # for multi-cluster; not needed for single-cluster
+      name: whereami-grpc # Name of your Kubernetes Service for the gRPC backend (or in this case, the ServiceImport, because I'm using multi-cluster)
+      port: 9090 # Port of your gRPC service
