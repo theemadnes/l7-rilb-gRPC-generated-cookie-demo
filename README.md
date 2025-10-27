@@ -70,7 +70,162 @@ EOF
 export GATEWAY_VIP="10.128.0.33"
 ```
 
-Call the gRPC service using grpcurl
+Call the gRPC service using grpcurl and notice the `set-cookie` header
 ```
-grpcurl -plaintext -proto whereami.proto $GATEWAY_VIP:80 whereami.Whereami.GetPayload
+grpcurl -v -plaintext -proto whereami.proto $GATEWAY_VIP:80 whereami.Whereami.GetPayload 
+```
+
+Output:
+```
+$ grpcurl -v -plaintext -proto whereami.proto $GATEWAY_VIP:80 whereami.Whereami.GetPayload 
+
+Resolved method descriptor:
+// Send host name and get other metadata back
+rpc GetPayload ( .whereami.Empty ) returns ( .whereami.WhereamiReply );
+
+Request metadata to send:
+(empty)
+
+Response headers received:
+content-type: application/grpc
+date: Mon, 27 Oct 2025 00:44:04 GMT
+grpc-accept-encoding: identity, deflate, gzip
+set-cookie: GCILB="e5cf7b28d9d331a4"; Max-Age=3600; Path=/; HttpOnly
+via: 1.1 google
+
+Response contents:
+{
+  "clusterName": "edge-to-mesh-01",
+  "metadata": "grpc-frontend",
+  "nodeName": "gk3-edge-to-mesh-01-nap-1c08r7is-f94d8802-jkrd",
+  "podIp": "10.54.2.154",
+  "podName": "whereami-grpc-75b6c67769-mpf5n",
+  "podNameEmoji": "🧎🏿‍♀️‍➡",
+  "podNamespace": "grpc-cookie",
+  "podServiceAccount": "whereami-grpc",
+  "projectId": "e2m-private-test-01",
+  "timestamp": "2025-10-27T00:44:04",
+  "zone": "us-central1-c",
+  "gceInstanceId": "4528778889087650357",
+  "gceServiceAccount": "e2m-private-test-01.svc.id.goog"
+}
+
+Response trailers received:
+(empty)
+Sent 0 requests and received 1 response
+```
+
+Now try the requests again with that header to verify that the same backend pod is used:
+```
+grpcurl -v -plaintext -proto whereami.proto -H 'Cookie: GCILB="e5cf7b28d9d331a4"' $GATEWAY_VIP:80 whereami.Whereami.GetPayload 
+```
+
+It works! 
+
+```
+admin@instance-20251026-225348:~$ grpcurl -v -plaintext -proto whereami.proto -H 'Cookie: GCILB="e5cf7b28d9d331a4"' $GATEWAY_VIP:80 whereami.Whereami.GetPayload 
+
+Resolved method descriptor:
+// Send host name and get other metadata back
+rpc GetPayload ( .whereami.Empty ) returns ( .whereami.WhereamiReply );
+
+Request metadata to send:
+cookie: GCILB="e5cf7b28d9d331a4"
+
+Response headers received:
+content-type: application/grpc
+date: Mon, 27 Oct 2025 01:17:14 GMT
+grpc-accept-encoding: identity, deflate, gzip
+via: 1.1 google
+
+Response contents:
+{
+  "clusterName": "edge-to-mesh-01",
+  "metadata": "grpc-frontend",
+  "nodeName": "gk3-edge-to-mesh-01-nap-1c08r7is-f94d8802-jkrd",
+  "podIp": "10.54.2.154",
+  "podName": "whereami-grpc-75b6c67769-mpf5n",
+  "podNameEmoji": "🧎🏿‍♀️‍➡",
+  "podNamespace": "grpc-cookie",
+  "podServiceAccount": "whereami-grpc",
+  "projectId": "e2m-private-test-01",
+  "timestamp": "2025-10-27T01:17:14",
+  "zone": "us-central1-c",
+  "gceInstanceId": "4528778889087650357",
+  "gceServiceAccount": "e2m-private-test-01.svc.id.goog"
+}
+
+Response trailers received:
+(empty)
+Sent 0 requests and received 1 response
+admin@instance-20251026-225348:~$ grpcurl -v -plaintext -proto whereami.proto -H 'Cookie: GCILB="e5cf7b28d9d331a4"' $GATEWAY_VIP:80 whereami.Whereami.GetPayload 
+
+Resolved method descriptor:
+// Send host name and get other metadata back
+rpc GetPayload ( .whereami.Empty ) returns ( .whereami.WhereamiReply );
+
+Request metadata to send:
+cookie: GCILB="e5cf7b28d9d331a4"
+
+Response headers received:
+content-type: application/grpc
+date: Mon, 27 Oct 2025 01:17:15 GMT
+grpc-accept-encoding: identity, deflate, gzip
+via: 1.1 google
+
+Response contents:
+{
+  "clusterName": "edge-to-mesh-01",
+  "metadata": "grpc-frontend",
+  "nodeName": "gk3-edge-to-mesh-01-nap-1c08r7is-f94d8802-jkrd",
+  "podIp": "10.54.2.154",
+  "podName": "whereami-grpc-75b6c67769-mpf5n",
+  "podNameEmoji": "🧎🏿‍♀️‍➡",
+  "podNamespace": "grpc-cookie",
+  "podServiceAccount": "whereami-grpc",
+  "projectId": "e2m-private-test-01",
+  "timestamp": "2025-10-27T01:17:15",
+  "zone": "us-central1-c",
+  "gceInstanceId": "4528778889087650357",
+  "gceServiceAccount": "e2m-private-test-01.svc.id.goog"
+}
+
+Response trailers received:
+(empty)
+Sent 0 requests and received 1 response
+admin@instance-20251026-225348:~$ grpcurl -v -plaintext -proto whereami.proto -H 'Cookie: GCILB="e5cf7b28d9d331a4"' $GATEWAY_VIP:80 whereami.Whereami.GetPayload 
+
+Resolved method descriptor:
+// Send host name and get other metadata back
+rpc GetPayload ( .whereami.Empty ) returns ( .whereami.WhereamiReply );
+
+Request metadata to send:
+cookie: GCILB="e5cf7b28d9d331a4"
+
+Response headers received:
+content-type: application/grpc
+date: Mon, 27 Oct 2025 01:17:16 GMT
+grpc-accept-encoding: identity, deflate, gzip
+via: 1.1 google
+
+Response contents:
+{
+  "clusterName": "edge-to-mesh-01",
+  "metadata": "grpc-frontend",
+  "nodeName": "gk3-edge-to-mesh-01-nap-1c08r7is-f94d8802-jkrd",
+  "podIp": "10.54.2.154",
+  "podName": "whereami-grpc-75b6c67769-mpf5n",
+  "podNameEmoji": "🧎🏿‍♀️‍➡",
+  "podNamespace": "grpc-cookie",
+  "podServiceAccount": "whereami-grpc",
+  "projectId": "e2m-private-test-01",
+  "timestamp": "2025-10-27T01:17:16",
+  "zone": "us-central1-c",
+  "gceInstanceId": "4528778889087650357",
+  "gceServiceAccount": "e2m-private-test-01.svc.id.goog"
+}
+
+Response trailers received:
+(empty)
+Sent 0 requests and received 1 response
 ```
