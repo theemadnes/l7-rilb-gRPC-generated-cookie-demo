@@ -1,0 +1,19 @@
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: generated-cookie-policy
+  namespace: grpc-cookie
+spec:
+  default:
+    # Include an HTTP cookie in the Set-Cookie header of the response.
+    # This field also sets the load balancer locality policy to MAGLEV. For more
+    # information, see
+    # https://cloud.google.com/load-balancing/docs/l7-internal#generated_cookie_affinity.
+    #sessionAffinity:
+    #  type: GENERATED_COOKIE
+    #  cookieTtlSec: 3600  # The cookie expires in 1 hour.
+    maxRatePerEndpoint: 40
+  targetRef:
+    group: ""
+    kind: Service
+    name: whereami-grpc
